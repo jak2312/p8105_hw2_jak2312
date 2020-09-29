@@ -24,6 +24,45 @@ trashwheel_df =
     sports_balls = round(sports_balls),
     sports_balls = as.integer(sports_balls)
   )
-  
+```
+
+Read the precipitation data
+
+```{r}
+precip_2018 = 
+  read_excel(
+    "./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", 
+    sheet = "2018 Precipitation",
+    skip = 1) %>%
+  janitor::clean_names() %>%
+  drop_na(month) %>%
+  mutate(year = 2018) %>%
+  relocate(year)
+
+precip_2017 = 
+  read_excel(
+    "./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", 
+    sheet = "2017 Precipitation",
+    skip = 1) %>%
+  janitor::clean_names() %>%
+  drop_na(month) %>%
+  mutate(year = 2017) %>%
+  relocate(year)
+```
+
+Combine annual precipitation
+
+```{r}
+
+```
+
+## Problem 2
+
+```{r}
+
+nyc_transit_df = read_csv("./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>% 
+  janitor::clean_names() %>% 
+  select(line, station_name, station_latitude, station_longitude, route1:route11, entrance_type, entry, vending, ada) %>% 
+  mutate(entry = recode(entry, "YES" = TRUE, "NO" = FALSE))
 ```
 
