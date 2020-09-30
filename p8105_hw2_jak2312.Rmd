@@ -53,12 +53,27 @@ precip_2017 =
 Combine annual precipitation
 
 ```{r}
+month_df = 
+	tibble(month = 1:12,
+		month_name = month.name)
 
+precip_df = 
+	bind_rows(precip_2018, precip_2017)
+
+precip_df =
+	left_join(precip_df, month_df, by = "month")
 ```
+
+This dataset contains information from the Mr. Trashwheel trash collector in Baltimore, Maryland. As trash enters the inner harbor, the trashwheel collects that trash, and stores it in a dumpster. The dataset contains information on year, month, and trash collected, include some specific kinds of trash. There are a total of `r nrow(trashwheel_df)` rows in our final dataset. Additional data sheets include month precipitation data. The median number of sports balls found in a dumpster in 2017 was `r trashwheel_df %>% filter(year == 2017) %>% pull(sports_balls) %>% median()`. The total precipitation in 2018 was `r precip_df %>% filter(year == 2018) %>% pull(total) %>% sum()` inches.
+
+(From Jeff's P8105 live-session on 9/24/2020)
+
 
 ## Problem 2
 
-```{r read_clean_df}
+**Read and clean transit data**
+
+```{r read_clean_df, message= FALSE}
 
 nyc_transit_df = read_csv("./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>% 
   janitor::clean_names() %>% 
@@ -88,6 +103,8 @@ Of the `r nyc_transit_df %>% distinct() %>% nrow()` distinct stations, `r nyc_tr
 * What proportion of station entrances/exits without vending allow entrance?  
 `r nyc_transit_df %>% distinct() %>% filter(entry == TRUE, vending == "NO") %>% nrow() / nyc_transit_df %>% distinct() %>% filter(vending == "NO") %>% nrow()`
 
+**Reformat transit data to have distinct variables for route number and route name**
+
 ```{r reformat_transit_df}
 
 reformat_nyc_transit_df = nyc_transit_df %>% 
@@ -110,7 +127,9 @@ reformat_nyc_transit_df = nyc_transit_df %>%
 
 ## Problem 3
 
-```{r read_fivethirtyeight_df}
+**Read in the 3 datasets from FiveThirtyEight, clean the datasets, and merge together**
+
+```{r read_fivethirtyeight_df, message= FALSE}
 
 pols_month_df = read_csv("./data/fivethirtyeight_datasets/pols-month.csv") %>% 
   janitor::clean_names() %>% 
@@ -138,4 +157,10 @@ joined_df = left_join(pols_month_df, snp_df, by = c("year", "month")) %>%
   left_join(unemployment_df, by= c("year", "month"))
 ```
 
-The pols-month.csv 
+The pols-month.csv contains data from each month from the years `r pols_month_df %>% pull(year) %>% min()` to `r pols_month_df %>% pull(year) %>% max()` of the number of national politicians who are republican or democratic at a specified time. After cleaning, the data set contains `r dim(pols_month_df)[1]` observations of `r dim(pols_month_df)[2]` variables: `r pols_month_df %>% names()`.  
+
+The snp.csv contains data from day 15 of each month from the years `r snp_df %>% pull(year) %>% min()` to `r snp_df %>% pull(year) %>% max()` of the Standard & Poor's stock market index (S&P) closing price at a given date. After cleaning, the data set contains `r dim(snp_df)[1]` observations of `r dim(snp_df)[2]` variables: `r snp_df %>% names()`.  
+
+The unemployment.csv contains data from each month from the years `r unemployment_df %>% pull(year) %>% min()` to `r unemployment_df %>% pull(year) %>% max()` of the unemployment rate at a given time. After cleaning, the data set contains `r dim(unemployment_df)[1]` observations of `r dim(unemployment_df)[2]` variables: `r unemployment_df %>% names()`.  
+
+Once the 3 datasets were combined. The resulting data set contained all the variables mentioned above: `r joined_df %>% names()`. The years range from : `r joined_df %>% pull(year) %>% min()` - `r joined_df %>% pull(year) %>% max()`. The dimensions of the merged dataframe are: `r dim(joined_df)[1]` rows by `r dim(joined_df)[2]` columns. Essentially, the closing S&P price and unemployment rate was merged into the national politician data for the given months of each year when available.
