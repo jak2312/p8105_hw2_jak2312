@@ -58,11 +58,49 @@ Combine annual precipitation
 
 ## Problem 2
 
-```{r}
+```{r read_clean_df}
 
 nyc_transit_df = read_csv("./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>% 
   janitor::clean_names() %>% 
-  select(line, station_name, station_latitude, station_longitude, route1:route11, entrance_type, entry, vending, ada) %>% 
+  select(line, 
+         station_name, 
+         station_latitude, 
+         station_longitude, 
+         route1:route11, 
+         entrance_type, 
+         entry, 
+         vending, 
+         ada) %>% 
   mutate(entry = recode(entry, "YES" = TRUE, "NO" = FALSE))
+
+```
+
+The NYC_Transit_Subway_Entrance_And_Exit_Data.csv file contains information on the different subway lines, their names, their entrance locations, routes the station connects to, the method to enter the station, if the station can be entered or is exit only, if vending is available, staffing status, ADA compliance, if it is free to crossover, and cross street information.  
+
+We are not interested in all these variables. To clean the data set, we first clean the variable names using the clean_names() function in the janitor library. Then we only retained the variable information: line, station name, station latitude and longitude, routes, method of entry, entry status, vending, and ADA compliance using the select() function and specifying the variable names. Finally, we converted the entry status variable from character to logical variable. The resulting data set is `r nrow(nyc_transit_df)` rows by `r ncol(nyc_transit_df)` columns. I would say that the data is untidy. There are some variables that are redundant, i.e. station location and entrance location as their latitude and longitudes are already stated in previous columns. Also, the fact that there are 11 different variables for each route that the station connects to widen the data set a lot and can probably be condensed into a single column that lists each route the stations connect to.
+
+* How many distinct stations are there?  
+There are `r nrow(distinct(nyc_transit_df))` distinct stations.
+
+* How many stations are ADA compliant?  
+Of the `r nrow(distinct(nyc_transit_df))` distinct stations, `r nrow(filter(distinct(nyc_transit_df), ada == TRUE))` are ADA compliant
+
+* What proportion of station entrances/exits without vending allow entrance?  
+`r nrow(filter(distinct(nyc_transit_df), entry == TRUE, vending == "NO")) / nrow(filter(distinct(nyc_transit_df), vending == "NO"))`
+
+```{r reformat_transit_df}
+
+################
+# REFORMAT DATA SO THAT ROUTE NUMBER AND ROUTE NAME ARE DISTINCT VARIABLES. HOW MANY STATIONS SERVE THE A TRAIN? OF THE STATIONS THAT SERVE THE A TRAIN, HOW MANY ARE ADA COMPLIANT?
+################
+
+```
+
+## Problem 3
+
+```{r read_pols_df}
+
+read_csv("./data/fivethirtyeight_datasets")
+
 ```
 
