@@ -100,7 +100,26 @@ Of the `r nyc_transit_df %>% distinct() %>% nrow()` distinct stations, `r nyc_tr
 
 ```{r read_fivethirtyeight_df}
 
-pols_month_df = read_csv("./data/fivethirtyeight_datasets/pols-month.csv")
+pols_month_df = read_csv("./data/fivethirtyeight_datasets/pols-month.csv") %>% 
+  janitor::clean_names() %>% 
+  separate(mon, into = c("year", "month", "day"), sep = "-") %>% 
+  mutate(month = month.abb[as.numeric(month)]) %>% 
+  mutate(president = prez_dem) %>% 
+  mutate(president = recode(president, `0` = "gop", `1` = "dem")) %>% 
+  select(-prez_gop, -prez_dem) %>% 
+  select(-day)
+
+snp_df = read_csv("./data/fivethirtyeight_datasets/snp.csv") %>% 
+  separate(date, into = c("month", "day", "year"), sep = "/") %>% 
+  relocate(year, month) %>% 
+   mutate(month = month.abb[as.numeric(month)]) %>% 
+  select(-day)
+
+unemployment_df = read_csv("./data/fivethirtyeight_datasets/unemployment.csv") %>% 
+  pivot_longer(Jan:Dec,
+               names_to = "month",
+               values_to = "unemployment rate") %>% 
+  janitor::clean_names()
 
 ```
 
